@@ -1,6 +1,6 @@
 # 🧶 Personal Nix Flake Templates
 
-[![CI – nix flake check](https://github.com/milchinskiy/nix-templates/actions/workflows/flake-check.yml/badge.svg)](https://github.com/milchinskiy/nix-templates/actions/workflows/flake-check.yml)
+[![Nix Flake Check](https://github.com/milchinskiy/nix-templates/actions/workflows/flake-check.yml/badge.svg)](https://github.com/milchinskiy/nix-templates/actions/workflows/flake-check.yml)
 
 This repository contains a collection of reusable Nix flake templates for
 various types of projects. Each template is minimal, idiomatic, and leverages
@@ -27,5 +27,5 @@ You can use these templates directly with [`nix flake init`](https://nixos.wiki/
 
 ```bash
 # Create a new project using one of the templates
-nix flake init -t github:<your-username>/<repo-name>#<template-name>
+nix flake init -t github:milchinskiy/nix-templates#<template-name>
 ```
