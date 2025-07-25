@@ -1,7 +1,7 @@
 {
   description = "A collection of my personal flake templates";
 
-  outputs = { ... }: {
+  outputs = { self, ... }: {
     templates = {
       rust-base = {
         path = ./templates/rust-base;
@@ -23,6 +23,8 @@
         path = ./templates/go-base;
         description = "Minimal Go project using flake-utils";
       };
+
+      default = self.templates.trivial;
     };
   };
 }
