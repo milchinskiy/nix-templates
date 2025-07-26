@@ -14,6 +14,7 @@
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
+        rustLibSrc = pkgs.rustPlatform.rustLibSrc;
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
@@ -23,6 +24,8 @@
             rust-analyzer
             clippy
           ];
+
+          RUST_SRC_PATH = rustLibSrc;
 
           shellHook = ''
             echo "Rust toolchain: $(rustc --version)"
