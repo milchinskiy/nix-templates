@@ -15,6 +15,7 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
         rustLibSrc = pkgs.rustPlatform.rustLibSrc;
+        manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
@@ -35,8 +36,8 @@
         };
 
         packages.default = pkgs.rustPlatform.buildRustPackage {
-          pname = "my-rust-project";
-          version = "0.1.0";
+          pname = manifest.name;
+          version = manifest.version;
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
         };
