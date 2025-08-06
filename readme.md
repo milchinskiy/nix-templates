@@ -18,6 +18,7 @@ and reproducible builds.
 | `typescript`         | 📘 Base flake template for a TypeScript project. Provides `nodejs` and `tsc` via `nixpkgs`.           |
 | `vite-vue-typescript`| ⚡️ Base Vite + Vue 3 + TypeScript project using `flake-utils`. Includes dev shell and build logic.     |
 | `go-base`            | 🐹 Minimal Go project flake using `flake-utils`. Supports `go.mod` builds with `buildGoModule`.         |
+| `clang`              | 🚀 Base flake template for a C/C++ project. Provides `clang`, `cmake` and `clang-tools` via `nixpkgs`. |
 
 ---
 
