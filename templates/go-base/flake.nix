@@ -3,20 +3,23 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
-  }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {inherit system;};
-    in {
-      # Dev shell with Go
-      devShells.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
+  }: let
+    supportedSystems = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+
+    eachSystem = nixpkgs.lib.genAttrs supportedSystems (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+        nativeBuildInputs = with pkgs; [
           go
           gopls
           golangci-lint-langserver
@@ -24,20 +27,41 @@
           goimports-reviser
           golines
         ];
-      };
+        buildInputs = [
+        ];
+      in {
+        devShell = pkgs.mkShell {
+          inherit nativeBuildInputs buildInputs;
+          packages = [];
+          shellHook = ''
+            go --version
+          '';
+        };
 
-      # Build Go project with `nix build`
-      packages.default = pkgs.buildGoModule {
-        pname = "go-app";
-        version = "0.1.0";
+        package = pkgs.stdenv.mkDerivation {
+          inherit nativeBuildInputs buildInputs;
+          name = "go-app";
+          src = ./.;
+          installPhase = ''
+            echo "Installing project"
+          '';
+          buildPhase = ''
+            echo "Building project"
+          '';
+        };
+      }
+    );
+  in {
+    devShells =
+      nixpkgs.lib.mapAttrs (system: systemAttrs: {
+        default = systemAttrs.devShell;
+      })
+      eachSystem;
 
-        src = ./.;
-
-        # auto-detect go.mod and go.sum
-        vendorSha256 = null;
-
-        # Optional: uncomment if using a main package in a subdirectory
-        # subPackages = [ "./cmd/myapp" ];
-      };
-    });
+    packages =
+      nixpkgs.lib.mapAttrs (system: systemAttrs: {
+        default = systemAttrs.package;
+      })
+      eachSystem;
+  };
 }

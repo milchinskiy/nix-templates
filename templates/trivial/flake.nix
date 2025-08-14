@@ -3,31 +3,57 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
-  }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {
-        inherit system;
-      };
-    in {
-      devShells.default = pkgs.mkShell {
-        # buildInputs = with pkgs; [];
-      };
+  }: let
+    supportedSystems = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
 
-      packages.default = pkgs.stdenv.mkDerivation {
-        name = "trivial-project";
-        src = ./.;
-        buildPhase = "true";
-        installPhase = ''
-          mkdir -p $out
-          echo "Hello from base flake" > $out/README.txt
-        '';
-      };
-    });
+    eachSystem = nixpkgs.lib.genAttrs supportedSystems (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+        nativeBuildInputs = [];
+        buildInputs = [];
+      in {
+        devShell = pkgs.mkShell {
+          inherit nativeBuildInputs buildInputs;
+          packages = [];
+          shellHook = ''
+            echo "Shell hook"
+          '';
+        };
+
+        package = pkgs.stdenv.mkDerivation {
+          inherit nativeBuildInputs buildInputs;
+          name = "trivial-project";
+          src = ./.;
+          installPhase = ''
+            echo "Installing project"
+          '';
+          buildPhase = ''
+            echo "Building project"
+          '';
+        };
+      }
+    );
+  in {
+    devShells =
+      nixpkgs.lib.mapAttrs (system: systemAttrs: {
+        default = systemAttrs.devShell;
+      })
+      eachSystem;
+
+    packages =
+      nixpkgs.lib.mapAttrs (system: systemAttrs: {
+        default = systemAttrs.package;
+      })
+      eachSystem;
+  };
 }

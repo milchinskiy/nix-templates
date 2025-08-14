@@ -3,31 +3,37 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
-    flake-utils,
+    self,
     nixpkgs,
-    ...
-  }:
-    flake-utils.lib.eachDefaultSystem (
+  }: let
+    supportedSystems = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+
+    eachSystem = nixpkgs.lib.genAttrs supportedSystems (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        rustLibSrc = pkgs.rustPlatform.rustLibSrc;
         manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
+        nativeBuildInputs = with pkgs; [
+          cargo
+          rustc
+          rustfmt
+          rust-analyzer
+          clippy
+        ];
+        buildInputs = [];
       in {
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            cargo
-            rustc
-            rustfmt
-            rust-analyzer
-            clippy
+        devShell = pkgs.mkShell {
+          inherit nativeBuildInputs buildInputs;
+          packages = with pkgs; [
+            gdb
           ];
-
-          RUST_SRC_PATH = rustLibSrc;
-
           shellHook = ''
             echo "Rust toolchain: $(rustc --version)"
             echo "Rust analyzer: $(rust-analyzer --version)"
@@ -35,12 +41,32 @@
           '';
         };
 
-        packages.default = pkgs.rustPlatform.buildRustPackage {
-          pname = manifest.name;
+        package = pkgs.stdenv.mkDerivation {
+          inherit nativeBuildInputs buildInputs;
+          name = manifest.name;
           version = manifest.version;
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
+          installPhase = ''
+            echo "Installing project"
+          '';
+          buildPhase = ''
+            echo "Building project"
+          '';
         };
       }
     );
+  in {
+    devShells =
+      nixpkgs.lib.mapAttrs (system: systemAttrs: {
+        default = systemAttrs.devShell;
+      })
+      eachSystem;
+
+    packages =
+      nixpkgs.lib.mapAttrs (system: systemAttrs: {
+        default = systemAttrs.package;
+      })
+      eachSystem;
+  };
 }

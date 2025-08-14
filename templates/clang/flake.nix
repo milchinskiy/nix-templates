@@ -29,7 +29,6 @@
           glibc.dev
         ];
       in {
-        # Define all outputs for this system here.
         devShell = pkgs.mkShell {
           inherit nativeBuildInputs buildInputs;
           packages = with pkgs; [

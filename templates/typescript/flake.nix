@@ -3,43 +3,61 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
-  }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {inherit system;};
-    in {
-      devShells.default = pkgs.mkShell {
-        buildInputs = [
-          pkgs.nodejs
-          pkgs.nodePackages.typescript # includes `tsc`
+  }: let
+    supportedSystems = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
+
+    eachSystem = nixpkgs.lib.genAttrs supportedSystems (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+        nativeBuildInputs = with pkgs; [
+          nodejs
+          nodePackages.typescript
         ];
-      };
+        buildInputs = [];
+      in {
+        devShell = pkgs.mkShell {
+          inherit nativeBuildInputs buildInputs;
+          packages = [];
+          shellHook = ''
+            echo "Node.js version: $(node --version)"
+            echo "TypeScript version: $(tsc --version)"
+          '';
+        };
 
-      packages.default = pkgs.stdenv.mkDerivation {
-        pname = "ts-app";
-        version = "0.1.0";
-        src = ./.;
+        package = pkgs.stdenv.mkDerivation {
+          inherit nativeBuildInputs buildInputs;
+          name = "ts-app";
+          src = ./.;
+          installPhase = ''
+            echo "Installing project"
+          '';
+          buildPhase = ''
+            echo "Building project"
+          '';
+        };
+      }
+    );
+  in {
+    devShells =
+      nixpkgs.lib.mapAttrs (system: systemAttrs: {
+        default = systemAttrs.devShell;
+      })
+      eachSystem;
 
-        buildInputs = [
-          pkgs.nodejs
-          pkgs.nodePackages.typescript
-        ];
-
-        buildPhase = ''
-          echo "Compiling TypeScript..."
-          tsc
-        '';
-
-        installPhase = ''
-          mkdir -p $out
-          cp -r dist/* $out/
-        '';
-      };
-    });
+    packages =
+      nixpkgs.lib.mapAttrs (system: systemAttrs: {
+        default = systemAttrs.package;
+      })
+      eachSystem;
+  };
 }
