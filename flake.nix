@@ -17,11 +17,11 @@
       };
       go-base = {
         path = ./templates/go-base;
-        description = "Minimal Go project using flake-utils";
+        description = "Base flake template for a go project";
       };
       clang = {
         path = ./templates/clang;
-        description = "Minimal clang project without external flakes";
+        description = "Base flake template for a clang project";
       };
 
       default = self.templates.trivial;

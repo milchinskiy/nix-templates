@@ -1,5 +1,5 @@
 {
-  description = "Minimal Go project using flake-utils";
+  description = "Base flake template for a go project";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

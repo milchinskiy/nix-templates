@@ -4,7 +4,7 @@
 
 This repository contains a collection of reusable Nix flake templates for
 various types of projects. Each template is minimal, idiomatic, and leverages
-`nixpkgs` (with optional `flake-utils`) to provide clean developer environments
+`nixpkgs` to provide clean developer environments
 and reproducible builds.
 
 ---
@@ -16,7 +16,7 @@ and reproducible builds.
 | `rust-base`          | 🦀 A base flake template for a Rust project. Includes `rustc`, `cargo`, and a minimal build setup. |
 | `trivial`            | 🧪 A trivial flake template — ideal for testing, experimentation, or learning how flakes work.         |
 | `typescript`         | 📘 Base flake template for a TypeScript project. Provides `nodejs` and `tsc` via `nixpkgs`.           |
-| `go-base`            | 🐹 Minimal Go project flake using `flake-utils`. Supports `go.mod` builds with `buildGoModule`.         |
+| `go-base`            | 🐹 Minimal Go project flake using `nixpkgs`. Supports `go.mod` builds with `buildGoModule`.         |
 | `clang`              | 🚀 Base flake template for a C/C++ project. Provides `clang`, `cmake` and `clang-tools` via `nixpkgs`. |
 
 ---
