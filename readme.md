@@ -13,10 +13,10 @@ and reproducible builds.
 
 | Template             | Description                                                           |
 |----------------------|-----------------------------------------------------------------------|
-| `rust-base`          | 🦀 A base flake template for a Rust project. Includes `rustc`, `cargo`, and a minimal build setup. |
 | `trivial`            | 🧪 A trivial flake template — ideal for testing, experimentation, or learning how flakes work.         |
+| `rust-base`          | 🦀 Base flake template for a Rust project. Includes `rustc`, `cargo`, and a minimal build setup. |
 | `typescript`         | 📘 Base flake template for a TypeScript project. Provides `nodejs` and `tsc` via `nixpkgs`.           |
-| `go-base`            | 🐹 Minimal Go project flake using `nixpkgs`. Supports `go.mod` builds with `buildGoModule`.         |
+| `go-base`            | 🐹 Base flake template for a Go project. Provides `go` and `gopls` via `nixpkgs`.                  |
 | `clang`              | 🚀 Base flake template for a C/C++ project. Provides `clang`, `cmake` and `clang-tools` via `nixpkgs`. |
 
 ---
