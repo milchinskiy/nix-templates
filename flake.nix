@@ -11,6 +11,10 @@
         path = ./templates/rust-base;
         description = "A base flake template for a rust project";
       };
+      rust = {
+        path = ./templates/rust;
+        description = "A flake template for a rust project";
+      };
       typescript = {
         path = ./templates/typescript;
         description = "Base flake template for a typescript project";

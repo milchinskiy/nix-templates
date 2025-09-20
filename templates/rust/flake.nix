@@ -1,8 +1,8 @@
 {
-  description = "A basic rust project";
+  description = "A rust project";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=25.05";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   };
 
   outputs = {
@@ -19,6 +19,7 @@
     eachSystem = nixpkgs.lib.genAttrs supportedSystems (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
+        manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
         nativeBuildInputs = with pkgs; [
           cargo
           rustc
@@ -30,10 +31,27 @@
       in {
         devShell = pkgs.mkShell {
           inherit nativeBuildInputs buildInputs;
+          packages = with pkgs; [
+            gdb
+          ];
           shellHook = ''
             echo "Rust toolchain: $(rustc --version)"
             echo "Rust analyzer: $(rust-analyzer --version)"
             echo "Clippy: $(clippy-driver --version)"
+          '';
+        };
+
+        package = pkgs.stdenv.mkDerivation {
+          inherit nativeBuildInputs buildInputs;
+          name = manifest.name;
+          version = manifest.version;
+          src = ./.;
+          cargoLock.lockFile = ./Cargo.lock;
+          installPhase = ''
+            echo "Installing project"
+          '';
+          buildPhase = ''
+            echo "Building project"
           '';
         };
       }
@@ -42,6 +60,12 @@
     devShells =
       nixpkgs.lib.mapAttrs (system: systemAttrs: {
         default = systemAttrs.devShell;
+      })
+      eachSystem;
+
+    packages =
+      nixpkgs.lib.mapAttrs (system: systemAttrs: {
+        default = systemAttrs.package;
       })
       eachSystem;
   };
