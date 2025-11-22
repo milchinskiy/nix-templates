@@ -7,13 +7,9 @@
         path = ./templates/trivial;
         description = "A trivial flake template";
       };
-      rust-base = {
-        path = ./templates/rust-base;
-        description = "A base flake template for a rust project";
-      };
       rust = {
         path = ./templates/rust;
-        description = "A flake template for a rust project";
+        description = "Base flake template for a rust project";
       };
       typescript = {
         path = ./templates/typescript;
